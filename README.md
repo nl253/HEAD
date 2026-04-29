@@ -12,6 +12,7 @@
 - [Elements](#elements)
 - [Meta](#meta)
 - [Link](#link)
+- [Scripts](#scripts)
 - [Icons](#icons)
 - [Social](#social)
   - [Facebook Open Graph](#facebook-open-graph)
@@ -125,6 +126,9 @@ These elements provide information for how a document should be perceived, and r
 
 <!-- Theme Color for Chrome, Firefox OS and Opera -->
 <meta name="theme-color" content="#4285f4">
+
+<!-- Indicates the supported color schemes for the page (light, dark, or both) -->
+<meta name="color-scheme" content="light dark">
 
 <!-- Short description of the document (limit to 150 characters) -->
 <!-- This content *may* be used as a part of search engine results. -->
@@ -266,6 +270,38 @@ These elements provide information for how a document should be perceived, and r
 
 - 📖 [Link Relations](https://www.iana.org/assignments/link-relations/link-relations.xhtml)
 
+## Scripts
+
+```html
+<!--
+  Scripts: place <script> tags at the end of <body> when possible.
+  The following attributes control loading behavior when placed in <head>:
+-->
+
+<!-- Blocks HTML parsing and content rendering until the script is fetched and executed -->
+<script src="script.js"></script>
+
+<!-- The script will be fetched in parallel with parsing and executed as soon as it is available (before parsing completes) -->
+<script async src="script.js"></script>
+
+<!-- The script will be fetched in parallel with parsing and executed when the page has finished parsing -->
+<script defer src="script.js"></script>
+
+<!-- async takes precedence in modern browsers; defer acts as a fallback for older browsers that don't support async -->
+<script async defer src="script.js"></script>
+
+<!-- Inline script -->
+<script>
+  // function(s) go here
+</script>
+
+<!-- Subresource Integrity (SRI): use the integrity attribute to verify that the fetched resource has been delivered without unexpected manipulation -->
+<script src="https://example.com/script.js" integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC"></script>
+```
+
+- 📖 [async vs defer attributes](https://www.growingwiththeweb.com/2014/02/async-vs-defer-attributes.html)
+- 📖 [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
+
 ## Icons
 
 ```html
@@ -352,6 +388,29 @@ If you embed tweets in your website, Twitter can use information from your site 
 
 - 📖 [Getting Started - schema.org](https://schema.org/docs/gs.html)
 - 🛠 Test your page with the [Rich Results Test](https://search.google.com/test/rich-results)
+
+### Google JSON-LD Schema
+
+The following is used by Google to help provide your site with a knowledge graph result when someone Googles you (this is the pane to the right of the search results that typically appears for larger brands):
+
+```
+<script type="application/ld+json">
+  {  
+    "@context":"http://schema.org",
+    "@type":"Organization",
+    "name":"yourbrand.com",
+    "url":"https://www.yourbrand.com/",
+    "logo":"https://www.yourbrand.com/logo.png",
+    "sameAs":[  
+      "https://www.facebook.com/yourbrand",
+      "https://twitter.com/yourbrand",
+      "https://uk.pinterest.com/yourbrand/",
+      "https://www.instagram.com/yourbrand/",
+      "https://www.linkedin.com/company/yourbrand-com",
+    ]
+  }
+</script>
+```
 
 ### Pinterest
 
@@ -567,8 +626,8 @@ Minimum required xml markup for `browserconfig.xml`:
 
 ## Other Resources
 
-- 📖 [HTML5 Boilerplate Docs: The HTML](https://github.com/h5bp/html5-boilerplate/blob/master/dist/doc/html.md)
-- 📖 [HTML5 Boilerplate Docs: Extend and customize](https://github.com/h5bp/html5-boilerplate/blob/master/dist/doc/extend.md)
+- 📖 [HTML5 Boilerplate Docs: The HTML](https://github.com/h5bp/html5-boilerplate/blob/main/docs/html.md)
+- 📖 [HTML5 Boilerplate Docs: Extend and customize](https://github.com/h5bp/html5-boilerplate/blob/main/docs/extend.md)
 
 ## Related Projects
 
