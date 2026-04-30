@@ -10,29 +10,29 @@
 
 - [Recommended Minimum](#recommended-minimum)
 - [Elements](#elements)
+- [Recommended Order](#recommended-order)
 - [Meta](#meta)
 - [Link](#link)
 - [Scripts](#scripts)
 - [Icons](#icons)
 - [Social](#social)
-  - [Facebook Open Graph](#facebook-open-graph)
-  - [Twitter Card](#twitter-card)
-  - [Twitter Privacy](#twitter-privacy)
+  - [Open Graph](#open-graph)
   - [Schema.org](#schemaorg)
+  - [Google JSON-LD Schema](#google-json-ld-schema)
   - [Pinterest](#pinterest)
-  - [Facebook Instant Articles](#facebook-instant-articles)
   - [OEmbed](#oembed)
   - [QQ/Wechat](#qqwechat)
+  - [Dublin Core](#dublin-core)
 - [Browsers / Platforms](#browsers--platforms)
   - [Apple iOS](#apple-ios)
   - [Google Android](#google-android)
   - [Google Chrome](#google-chrome)
-  - [Microsoft Internet Explorer](#microsoft-internet-explorer)
 - [Browsers (Chinese)](#browsers-chinese)
   - [360 Browser](#360-browser)
   - [QQ Mobile Browser](#qq-mobile-browser)
   - [UC Mobile Browser](#uc-mobile-browser)
 - [App Links](#app-links)
+- [Deprecated](#deprecated)
 - [Other Resources](#other-resources)
 - [Related Projects](#related-projects)
 - [Other Formats](#other-formats)
@@ -50,10 +50,10 @@ Below are the essential elements for any web document (websites/apps):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--
-  The above 2 meta tags *must* come first in the <head>
+  The above 2 meta tags should come as early as possible in the <head>
   to consistently ensure proper document rendering.
   Any other head element should come *after* these tags.
- -->
+-->
 <title>Page Title</title>
 ```
 
@@ -103,11 +103,54 @@ These elements provide information for how a document should be perceived, and r
 </noscript>
 ```
 
+## Recommended Order
+
+The following is the recommended order of elements in the `<head>` for best performance and correct document rendering:
+
+1. `<meta charset>` — Character encoding declaration; **must** appear within the first 1024 bytes of the document
+2. `<meta name="viewport">` — Viewport settings; declare early to ensure correct responsive rendering
+3. `<title>` — Document title; placed after encoding/viewport to prevent potential re-rendering
+4. Other `<meta>` tags (description, robots, etc.)
+5. Open Graph / Social meta tags
+6. `<link rel="canonical">` and other `<link>` tags (excluding stylesheets and resource hints)
+7. `<link rel="preconnect">` / `<link rel="dns-prefetch">` — Resource hints; early to maximize their value
+8. `<link rel="stylesheet">` — External CSS; stylesheets should come before scripts
+9. `<link rel="icon">` — Favicons
+10. `<script>` — Scripts; use `defer` or `async` where possible to avoid blocking rendering
+
+```html
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Page Title</title>
+
+  <meta name="description" content="Page description">
+  <!-- other meta tags -->
+
+  <!-- Open Graph / Social meta tags -->
+  <meta property="og:title" content="Page Title">
+  <!-- other social meta tags -->
+
+  <link rel="canonical" href="https://example.com/page.html">
+  <!-- other link tags (excluding stylesheets and resource hints) -->
+
+  <link rel="preconnect" href="https://example.com">
+  <link rel="dns-prefetch" href="https://example.com">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="icon" href="favicon.ico">
+
+  <script defer src="script.js"></script>
+</head>
+```
+
 ## Meta
 
 ```html
 <!--
-  The following 2 meta tags *must* come first in the <head>
+  The following 2 meta tags should come as early as possible in the <head>
   to consistently ensure proper document rendering.
   Any other head element should come *after* these tags.
 -->
@@ -148,7 +191,6 @@ These elements provide information for how a document should be perceived, and r
 <meta name="google-site-verification" content="verification_token"><!-- Google Search Console -->
 <meta name="yandex-verification" content="verification_token"><!-- Yandex Webmasters -->
 <meta name="msvalidate.01" content="verification_token"><!-- Bing Webmaster Center -->
-<meta name="alexaVerifyID" content="verification_token"><!-- Alexa Console -->
 <meta name="p:domain_verify" content="code_from_pinterest"><!-- Pinterest Console-->
 <meta name="norton-safeweb-site-verification" content="norton_code"><!-- Norton Safe Web -->
 
@@ -167,21 +209,17 @@ These elements provide information for how a document should be perceived, and r
 <!-- Disable automatic detection and formatting of possible phone numbers -->
 <meta name="format-detection" content="telephone=no">
 
-<!-- Completely opt out of DNS prefetching by setting to "off" -->
-<meta http-equiv="x-dns-prefetch-control" content="off">
-
-<!-- Specifies the document to appear in a specific frame -->
-<meta http-equiv="Window-Target" content="_value">
-
 <!-- Geo tags -->
-<meta name="ICBM" content="latitude, longitude">
-<meta name="geo.position" content="latitude;longitude">
+<meta name="ICBM" content="latitude, longitude"><!-- Geographic coordinates (latitude, longitude) in decimal degrees; eg. content="48.8566, 2.3522" -->
+<meta name="geo.position" content="latitude;longitude"><!-- Geographic coordinates; latitude and longitude are separated by a semicolon -->
 <meta name="geo.region" content="country[-state]"><!-- Country code (ISO 3166-1): mandatory, state code (ISO 3166-2): optional; eg. content="US" / content="US-NY" -->
 <meta name="geo.placename" content="city/town"><!-- eg. content="New York City" -->
 
 <!-- Web Monetization https://webmonetization.org/docs/getting-started -->
 <meta name="monetization" content="$paymentpointer.example">
 ```
+
+**Note:** Geo tags are **not** used by browsers directly — they are intended for search engines, web crawlers, and location-based services to understand the geographic relevance of a page's content. `ICBM` (named after the military ICBM address convention) and `geo.position` both express coordinates in decimal degrees; `ICBM` uses a comma separator while `geo.position` uses a semicolon. `geo.region` identifies the country (and optionally the state/region) using ISO codes, and `geo.placename` provides a human-readable place name.
 
 - 📖 [Meta tags that Google understands](https://support.google.com/webmasters/answer/79812?hl=en)
 - 📖 [WHATWG Wiki: MetaExtensions](https://wiki.whatwg.org/wiki/MetaExtensions)
@@ -196,9 +234,6 @@ These elements provide information for how a document should be perceived, and r
 
 <!-- Helps prevent duplicate content issues -->
 <link rel="canonical" href="https://example.com/article/?page=2">
-
-<!-- Links to an AMP HTML version of the current document -->
-<link rel="amphtml" href="https://example.com/path/to/amp-version.html">
 
 <!-- Links to a JSON file that specifies "installation" credentials for the web applications -->
 <link rel="manifest" href="manifest.json">
@@ -219,24 +254,12 @@ These elements provide information for how a document should be perceived, and r
 <link rel="me" href="mailto:name@example.com">
 <link rel="me" href="sms:+15035550125">
 
-<!-- Links to a document that describes a collection of records, documents, or other materials of historical interest -->
-<link rel="archives" href="https://example.com/archives/">
-
-<!-- Links to top level resource in an hierarchical structure -->
-<link rel="index" href="https://example.com/article/">
-
 <!-- Provides a self reference - useful when the document has multiple possible references -->
 <link rel="self" type="application/atom+xml" href="https://example.com/atom.xml">
 
 <!-- The previous, and next documents in a series of documents, respectively -->
 <link rel="prev" href="https://example.com/article/?page=1">
 <link rel="next" href="https://example.com/article/?page=3">
-
-<!-- Used when a 3rd party service is utilized to maintain a blog -->
-<link rel="EditURI" href="https://example.com/xmlrpc.php?rsd" type="application/rsd+xml" title="RSD">
-
-<!-- Forms an automated comment when another WordPress blog links to your WordPress blog or post -->
-<link rel="pingback" href="https://example.com/xmlrpc.php">
 
 <!-- Notifies a URL when you link to it on your document
      More information at https://webmention.net -->
@@ -264,7 +287,7 @@ These elements provide information for how a document should be perceived, and r
 <link rel="dns-prefetch" href="//example.com/">
 <link rel="preconnect" href="https://www.example.com/">
 <link rel="prefetch" href="https://www.example.com/">
-<link rel="prerender" href="https://example.com/">
+
 <link rel="preload" href="image.png" as="image">
 ```
 
@@ -313,24 +336,19 @@ These elements provide information for how a document should be perceived, and r
 
 <!-- Apple Touch Icon (reuse 192px icon.png) -->
 <link rel="apple-touch-icon" href="/path/to/apple-touch-icon.png">
-
-<!-- Safari Pinned Tab Icon -->
-<link rel="mask-icon" href="/path/to/icon.svg" color="blue">
 ```
 
 - 📖 [All About Favicons (And Touch Icons)](https://bitsofco.de/all-about-favicons-and-touch-icons/)
-- 📖 [Creating Pinned Tab Icons](https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/pinnedTabs/pinnedTabs.html)
 - 📖 [Favicon Cheat Sheet](https://github.com/audreyr/favicon-cheat-sheet)
 - 📖 [Icons & Browser Colors](https://developers.google.com/web/fundamentals/design-and-ux/browser-customization/)
 
 ## Social
 
-### Facebook Open Graph
+### Open Graph
 
-> Most content is shared to Facebook as a URL, so it's important that you mark up your website with Open Graph tags to take control over how your content appears on Facebook. [More about Facebook Open Graph Markup](https://developers.facebook.com/docs/sharing/webmasters#markup)
+> The [Open Graph protocol](https://ogp.me/) is the de facto standard for controlling how your content appears when shared on social platforms. Originally created by Facebook, it's now consumed by most major platforms — including LinkedIn, X (as a fallback when Twitter Card tags are absent), Discord, Slack, iMessage, Mastodon, Bluesky, and WhatsApp.
 
 ```html
-<meta property="fb:app_id" content="123456789">
 <meta property="og:url" content="https://example.com/page.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Content Title">
@@ -342,35 +360,8 @@ These elements provide information for how a document should be perceived, and r
 <meta property="article:author" content="">
 ```
 
-- 📖 [Open Graph protocol](http://ogp.me/)
-- 🛠 Test your page with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
-
-### Twitter Card
-
-> With Twitter Cards, you can attach rich photos, videos and media experiences to Tweets, helping to drive traffic to your website. [More about Twitter Cards](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/abouts-cards)
-
-```html
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="@site_account">
-<meta name="twitter:creator" content="@individual_account">
-<meta name="twitter:url" content="https://example.com/page.html">
-<meta name="twitter:title" content="Content Title">
-<meta name="twitter:description" content="Content description less than 200 characters">
-<meta name="twitter:image" content="https://example.com/image.jpg">
-<meta name="twitter:image:alt" content="A text description of the image conveying the essential nature of an image to users who are visually impaired. Maximum 420 characters.">
-```
-
-- 📖 [Getting started with cards — Twitter Developers](https://dev.twitter.com/cards/getting-started)
-- 🛠 Test your page with the [Twitter Card Validator](https://cards-dev.twitter.com/validator)
-
-### Twitter Privacy
-
-If you embed tweets in your website, Twitter can use information from your site to tailor content and suggestions to Twitter users. [More about Twitter privacy options](https://dev.twitter.com/web/overview/privacy#what-privacy-options-do-website-publishers-have).
-
-```html
-<!-- disallow Twitter from using your site's info for personalization purposes -->
-<meta name="twitter:dnt" content="on">
-```
+- 📖 [Open Graph protocol](https://ogp.me/)
+- 🛠 Test your page with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 
 ### Schema.org
 
@@ -393,20 +384,20 @@ If you embed tweets in your website, Twitter can use information from your site 
 
 The following is used by Google to help provide your site with a knowledge graph result when someone Googles you (this is the pane to the right of the search results that typically appears for larger brands):
 
-```
+```html
 <script type="application/ld+json">
-  {  
-    "@context":"http://schema.org",
-    "@type":"Organization",
-    "name":"yourbrand.com",
-    "url":"https://www.yourbrand.com/",
-    "logo":"https://www.yourbrand.com/logo.png",
-    "sameAs":[  
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "yourbrand.com",
+    "url": "https://www.yourbrand.com/",
+    "logo": "https://www.yourbrand.com/logo.png",
+    "sameAs": [
       "https://www.facebook.com/yourbrand",
       "https://twitter.com/yourbrand",
       "https://uk.pinterest.com/yourbrand/",
       "https://www.instagram.com/yourbrand/",
-      "https://www.linkedin.com/company/yourbrand-com",
+      "https://www.linkedin.com/company/yourbrand-com"
     ]
   }
 </script>
@@ -419,22 +410,6 @@ Pinterest lets you prevent people from saving things from your website, accordin
 ```html
 <meta name="pinterest" content="nopin" description="Sorry, you can't save from my website!">
 ```
-
-### Facebook Instant Articles
-
-```html
-<meta charset="utf-8">
-<meta property="op:markup_version" content="v1.0">
-
-<!-- The URL of the web version of your article -->
-<link rel="canonical" href="https://example.com/article.html">
-
-<!-- The style to be used for this article -->
-<meta property="fb:article_style" content="myarticlestyle">
-```
-
-- 📖 [Creating Articles - Instant Articles](https://developers.facebook.com/docs/instant-articles/guides/articlecreate)
-- 📖 [Code Samples - Instant Articles](https://developers.facebook.com/docs/instant-articles/reference)
 
 ### OEmbed
 
@@ -460,6 +435,34 @@ Users share web pages to qq wechat will have a formatted message
 ```
 
 - 📖 [Code Format Docs](http://open.mobile.qq.com/api/mqq/index#api:setShareInfo)
+
+### Dublin Core
+
+[Dublin Core](https://www.dublincore.org/) is a metadata vocabulary standardized as [ISO 15836](https://www.iso.org/standard/71339.html) and maintained by the Dublin Core Metadata Initiative (DCMI). It defines fifteen core elements for describing resources and is widely used in digital libraries, institutional repositories, academic publishing, and government portals. To use Dublin Core in HTML, declare the DC namespace and then add the desired elements as `<meta>` tags with a `DC.` prefix.
+
+```html
+<!-- Declare the Dublin Core namespace -->
+<link rel="schema.DC" href="https://purl.org/dc/elements/1.1/">
+
+<meta name="DC.title" content="Page Title">
+<meta name="DC.creator" content="Author Name">
+<meta name="DC.subject" content="Keywords; Topics">
+<meta name="DC.description" content="A brief description of the page content">
+<meta name="DC.publisher" content="Publisher Name">
+<meta name="DC.contributor" content="Contributor Name">
+<meta name="DC.date" content="YYYY-MM-DD">
+<meta name="DC.type" content="Text">
+<meta name="DC.format" content="text/html">
+<meta name="DC.identifier" content="https://example.com/page.html">
+<meta name="DC.source" content="https://example.com/original-source">
+<meta name="DC.language" content="en">
+<meta name="DC.relation" content="https://example.com/related">
+<meta name="DC.coverage" content="Spatial or temporal coverage">
+<meta name="DC.rights" content="Copyright Owner Name">
+```
+
+- 📖 [Dublin Core Metadata Element Set](https://www.dublincore.org/specifications/dublin-core/dces/)
+- 📖 [Using Dublin Core in HTML](https://www.dublincore.org/specifications/dublin-core/dcq-html/)
 
 ### Fediverse
 
@@ -490,10 +493,13 @@ Some Fediverse software such as Mastodon allow you to put your Fediverse handle 
 <meta name="apple-mobile-web-app-title" content="App Title">
 
 <!-- Enable standalone (full-screen) mode -->
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 
 <!-- Status bar appearance (has no effect unless standalone mode is enabled) -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<!-- Viewport fit for notched phones (iPhone X and later); add viewport-fit=cover to your existing viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <!-- iOS app deep linking -->
 <meta name="apple-itunes-app" content="app-id=APP-ID, app-argument=http/url-sample.com">
@@ -524,37 +530,6 @@ Some Fediverse software such as Mastodon allow you to put your Fediverse handle 
 <!-- Disable translation prompt -->
 <meta name="google" content="notranslate">
 ```
-
-### Microsoft Internet Explorer
-
-```html
-<!-- Force IE 8/9/10 to use its latest rendering engine -->
-<meta http-equiv="x-ua-compatible" content="ie=edge">
-
-<!-- Disable automatic detection and formatting of possible phone numbers by Skype Toolbar browser extension -->
-<meta name="skype_toolbar" content="skype_toolbar_parser_compatible">
-
-<!-- Windows Tiles -->
-<meta name="msapplication-config" content="/browserconfig.xml">
-```
-
-Minimum required xml markup for `browserconfig.xml`:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<browserconfig>
-   <msapplication>
-     <tile>
-        <square70x70logo src="small.png"/>
-        <square150x150logo src="medium.png"/>
-        <wide310x150logo src="wide.png"/>
-        <square310x310logo src="large.png"/>
-     </tile>
-   </msapplication>
-</browserconfig>
-```
-
-- 📖 [Browser configuration schema reference](https://msdn.microsoft.com/en-us/library/dn320426.aspx)
 
 ## Browsers (Chinese)
 
@@ -623,6 +598,10 @@ Minimum required xml markup for `browserconfig.xml`:
 ```
 
 - 📖 [App Links](https://developers.facebook.com/docs/applinks)
+
+## Deprecated
+
+For tags and elements that were once part of this guide but are no longer supported (Internet Explorer compatibility, Safari Pinned Tabs, Alexa verification, etc.), see [DEPRECATED.md](./DEPRECATED.md).
 
 ## Other Resources
 
